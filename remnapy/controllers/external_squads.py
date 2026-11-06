@@ -9,8 +9,11 @@ from remnapy.models import (
     CreateExternalSquadResponseDto,
     GetExternalSquadByUuidResponseDto,
     GetExternalSquadsResponseDto,
+    GetTagsResponseDto,
     ReorderExternalSquadsRequestDto,
     ReorderExternalSquadsResponseDto,
+    SetTagsRequestDto,
+    SetTagsResponseDto,
     UpdateExternalSquadRequestDto,
     UpdateExternalSquadResponseDto,
 )
@@ -88,4 +91,17 @@ class ExternalSquadsController(BaseController):
         body: Annotated[ReorderExternalSquadsRequestDto, PydanticBody()],
     ) -> ReorderExternalSquadsResponseDto:
         """Reorder external squads"""
+        ...
+
+    @get("/external-squads/tags", response_class=GetTagsResponseDto)
+    async def get_tags(self) -> GetTagsResponseDto:
+        """Get tags of External Squads (panel 3.4.0+)"""
+        ...
+
+    @patch("/external-squads/tags", response_class=SetTagsResponseDto)
+    async def set_tags(
+        self,
+        body: Annotated[SetTagsRequestDto, PydanticBody()],
+    ) -> SetTagsResponseDto:
+        """Set tags of a External Squad (panel 3.4.0+)"""
         ...

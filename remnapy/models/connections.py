@@ -196,3 +196,44 @@ class DropConnectionsRequestDto(BaseModel):
         serialization_alias="targetNodes",
         description="Selector for which nodes to send the drop event to",
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Geocheck (panel 3.3.0+)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class GeocheckByNodeRequestDto(BaseModel):
+    """Where the node checks from: an IP or a network interface, not both"""
+
+    ip: Optional[str] = None
+    interface: Optional[str] = None
+
+
+class GeocheckByNodeResponseDto(ConnectionsJobData):
+    """Response for POST /api/connections/geocheck/{nodeUuid}"""
+
+    pass
+
+
+class GeocheckImageDto(BaseModel):
+    format: Literal["svg"]
+    media_type: Literal["image/svg+xml"]
+    encoding: Literal["base64"]
+    data: str
+
+
+class GeocheckResultDto(BaseModel):
+    success: bool
+    node_uuid: UUID = Field(alias="nodeUuid")
+    image: Optional[GeocheckImageDto]
+    raw_report: Optional[dict] = Field(alias="rawReport")
+    message: Optional[str]
+
+
+class GeocheckByNodeResultResponseDto(BaseModel):
+    """Response for GET /api/connections/geocheck/{jobId}"""
+
+    is_completed: bool = Field(alias="isCompleted")
+    is_failed: bool = Field(alias="isFailed")
+    result: Optional[GeocheckResultDto]

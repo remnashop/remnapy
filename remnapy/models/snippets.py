@@ -2,6 +2,9 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, StringConstraints
 
+# panel 3.4.0+ also allows slashes, which group snippets into folders
+SNIPPET_NAME_PATTERN = r"^[A-Za-z0-9_ -]+(/[A-Za-z0-9_ -]+)*$"
+
 
 class SnippetItem(BaseModel):
     """Individual snippet item"""
@@ -41,7 +44,7 @@ class CreateSnippetRequestDto(BaseModel):
 
     name: Annotated[
         str,
-        StringConstraints(min_length=2, max_length=255, pattern=r"^[A-Za-z0-9_\s-]+$"),
+        StringConstraints(min_length=2, max_length=255, pattern=SNIPPET_NAME_PATTERN),
     ]
     snippet: list[dict]  # Array of objects
 
@@ -51,7 +54,7 @@ class UpdateSnippetRequestDto(BaseModel):
 
     name: Annotated[
         str,
-        StringConstraints(min_length=2, max_length=255, pattern=r"^[A-Za-z0-9_\s-]+$"),
+        StringConstraints(min_length=2, max_length=255, pattern=SNIPPET_NAME_PATTERN),
     ]
     snippet: list[dict]  # Array of objects
 
@@ -61,5 +64,14 @@ class DeleteSnippetRequestDto(BaseModel):
 
     name: Annotated[
         str,
-        StringConstraints(min_length=2, max_length=255, pattern=r"^[A-Za-z0-9_\s-]+$"),
+        StringConstraints(min_length=2, max_length=255, pattern=SNIPPET_NAME_PATTERN),
+    ]
+
+
+class SyncSnippetRequestDto(BaseModel):
+    """Re-applies a snippet to the config profiles using it (panel 3.2.3+)."""
+
+    name: Annotated[
+        str,
+        StringConstraints(min_length=2, max_length=255, pattern=SNIPPET_NAME_PATTERN),
     ]

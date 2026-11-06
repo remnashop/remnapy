@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
 
 from remnapy.enums import (
+    NodeIpStatus,
     TCRMEvents,
     TErrorsEvents,
     TNodeEvents,
@@ -361,6 +362,13 @@ class NodeVersionsDto(BaseModel):
     model_config = {"alias_generator": to_camel, "populate_by_name": True}
 
 
+class NodeIpDto(BaseModel):
+    """An address of a node and its role (panel 3.2.2+)."""
+
+    ip: str
+    status: NodeIpStatus
+
+
 class WebhookNodeDto(BaseModel):
     """Node entity as sent in node.* and torrent_blocker.report webhook events"""
 
@@ -404,6 +412,9 @@ class WebhookNodeDto(BaseModel):
     xray_uptime: float
     users_online: float
     note: Optional[str]
+
+    integration_uuids: list[UUID] = []  # panel 3.3.0+
+    ips: list[NodeIpDto] = []  # panel 3.2.2+
 
     model_config = {"alias_generator": to_camel, "populate_by_name": True}
 

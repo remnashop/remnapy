@@ -11,8 +11,11 @@ from remnapy.models import (
     GetAllInboundsResponseDto,
     GetConfigProfileByUuidResponseDto,
     GetInboundsByProfileUuidResponseDto,
+    GetTagsResponseDto,
     ReorderConfigProfilesRequestDto,
     ReorderConfigProfilesResponseDto,
+    SetTagsRequestDto,
+    SetTagsResponseDto,
     UpdateConfigProfileRequestDto,
     UpdateConfigProfileResponseDto,
 )
@@ -102,4 +105,17 @@ class ConfigProfilesController(BaseController):
         ],
     ) -> GetConfigProfileByUuidResponseDto:
         """Get computed config profile by uuid"""
+        ...
+
+    @get("/config-profiles/tags", response_class=GetTagsResponseDto)
+    async def get_tags(self) -> GetTagsResponseDto:
+        """Get tags of Config Profiles (panel 3.4.0+)"""
+        ...
+
+    @patch("/config-profiles/tags", response_class=SetTagsResponseDto)
+    async def set_tags(
+        self,
+        body: Annotated[SetTagsRequestDto, PydanticBody()],
+    ) -> SetTagsResponseDto:
+        """Set tags of a Config Profile (panel 3.4.0+)"""
         ...

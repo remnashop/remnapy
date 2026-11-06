@@ -26,6 +26,7 @@ class ConfigProfileDto(BaseModel):
     uuid: UUID
     name: str
     view_position: int = Field(alias="viewPosition")
+    tags: list[str] = Field(default_factory=list, description="Panel 3.4.0+.")
     config: dict[str, Any]
     inbounds: list[InboundDto]
     nodes: list[NodesProfileDto] = []

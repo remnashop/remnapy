@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from remnapy.enums import TrafficLimitStrategy, UserStatus
+from remnapy.models.hosts import HostMapperDto
 from remnapy.utils.happ_crypt import create_happ_crypto_link
 
 
@@ -257,6 +258,9 @@ class ResolvedSecurityOptions(BaseModel):
     )
     fingerprint: Optional[str] = None
     server_name: Optional[str] = Field(None, alias="serverName")
+    cipher_suites: Optional[str] = Field(
+        None, alias="cipherSuites", description="Panel 3.2.3+."
+    )
     ech_config_list: Optional[str] = Field(None, alias="echConfigList")
     ech_force_query: Optional[str] = Field(None, alias="echForceQuery")
     ech_sockopt: Optional[Any] = Field(None, alias="echSockopt")
@@ -281,6 +285,7 @@ class ResolvedClientOverrides(BaseModel):
     mihomo_ip_version: Optional[str] = Field(alias="mihomoIpVersion")
     server_description: Optional[str] = Field(alias="serverDescription")
     xray_json_template: Optional[Any] = Field(alias="xrayJsonTemplate")
+    mapper: Optional[HostMapperDto] = Field(None, description="Panel 3.3.0+.")
 
 
 class ResolvedProxyConfigMetadata(BaseModel):

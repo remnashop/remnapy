@@ -10,8 +10,11 @@ from remnapy.models import (
     CreateSubscriptionPageConfigResponseDto,
     GetSubscriptionPageConfigResponseDto,
     GetSubscriptionPageConfigsResponseDto,
+    GetTagsResponseDto,
     ReorderSubscriptionPageConfigsRequestDto,
     ReorderSubscriptionPageConfigsResponseDto,
+    SetTagsRequestDto,
+    SetTagsResponseDto,
     UpdateSubscriptionPageConfigRequestDto,
     UpdateSubscriptionPageConfigResponseDto,
 )
@@ -95,4 +98,17 @@ class SubscriptionPageConfigController(BaseController):
         body: Annotated[CloneSubscriptionPageConfigRequestDto, PydanticBody()],
     ) -> CloneSubscriptionPageConfigResponseDto:
         """Clone subscription page config"""
+        ...
+
+    @get("/subscription-page-configs/tags", response_class=GetTagsResponseDto)
+    async def get_tags(self) -> GetTagsResponseDto:
+        """Get tags of Subpage Configs (panel 3.4.0+)"""
+        ...
+
+    @patch("/subscription-page-configs/tags", response_class=SetTagsResponseDto)
+    async def set_tags(
+        self,
+        body: Annotated[SetTagsRequestDto, PydanticBody()],
+    ) -> SetTagsResponseDto:
+        """Set tags of a Subpage Config (panel 3.4.0+)"""
         ...

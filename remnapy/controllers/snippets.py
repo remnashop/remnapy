@@ -7,6 +7,7 @@ from remnapy.models import (
     CreateSnippetResponseDto,
     DeleteSnippetRequestDto,
     GetSnippetsResponseDto,
+    SyncSnippetRequestDto,
     UpdateSnippetRequestDto,
     UpdateSnippetResponseDto,
 )
@@ -41,4 +42,12 @@ class SnippetsController(BaseController):
         body: Annotated[DeleteSnippetRequestDto, PydanticBody()],
     ) -> None:
         """Delete snippet"""
+        ...
+
+    @post("/snippets/actions/sync", response_class=None)
+    async def sync_snippet(
+        self,
+        body: Annotated[SyncSnippetRequestDto, PydanticBody()],
+    ) -> None:
+        """Sync snippet to the config profiles using it (panel 3.2.3+)"""
         ...

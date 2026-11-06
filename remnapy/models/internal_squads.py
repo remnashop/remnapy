@@ -24,6 +24,7 @@ class InfoDto(BaseModel):
 class InternalSquadDto(BaseModel):
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
+    tags: list[str] = Field(default_factory=list, description="Panel 3.4.0+.")
     name: str
     info: Optional[InfoDto] = Field(default=None)
     inbounds: list[InboundsDto] = Field(default_factory=list)

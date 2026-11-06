@@ -45,6 +45,14 @@ class ResponseModifications(BaseModel):
     """Response modifications to apply when rule matches"""
 
     headers: Optional[list[ResponseModificationHeader]] = None
+    respond_with_remarks: Optional[list[str]] = Field(
+        None,
+        alias="respondWithRemarks",
+        description=(
+            "Panel 3.3.0+. Replaces the response with these remarks; with more "
+            "than one, actual hosts are not sent."
+        ),
+    )
     apply_headers_to_end: Optional[bool] = Field(
         None,
         alias="applyHeadersToEnd",

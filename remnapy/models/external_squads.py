@@ -56,6 +56,7 @@ class ExternalSquadDto(BaseModel):
 
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
+    tags: list[str] = Field(default_factory=list, description="Panel 3.4.0+.")
     name: str
     info: ExternalSquadInfoDto
     templates: list[ExternalSquadTemplateDto]

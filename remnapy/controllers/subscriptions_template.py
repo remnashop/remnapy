@@ -6,10 +6,13 @@ from rapid_api_client.annotations import Path, PydanticBody
 from remnapy.models import (
     CreateSubscriptionTemplateRequestDto,
     CreateSubscriptionTemplateResponseDto,
+    GetTagsResponseDto,
     GetTemplateResponseDto,
     GetTemplatesResponseDto,
     ReorderSubscriptionTemplatesRequestDto,
     ReorderSubscriptionTemplatesResponseDto,
+    SetTagsRequestDto,
+    SetTagsResponseDto,
     UpdateTemplateRequestDto,
     UpdateTemplateResponseDto,
 )
@@ -68,4 +71,17 @@ class SubscriptionsTemplateController(BaseController):
         body: Annotated[ReorderSubscriptionTemplatesRequestDto, PydanticBody()],
     ) -> ReorderSubscriptionTemplatesResponseDto:
         """Reorder subscription templates"""
+        ...
+
+    @get("/subscription-templates/tags", response_class=GetTagsResponseDto)
+    async def get_tags(self) -> GetTagsResponseDto:
+        """Get tags of Subscription Templates (panel 3.4.0+)"""
+        ...
+
+    @patch("/subscription-templates/tags", response_class=SetTagsResponseDto)
+    async def set_tags(
+        self,
+        body: Annotated[SetTagsRequestDto, PydanticBody()],
+    ) -> SetTagsResponseDto:
+        """Set tags of a Subscription Template (panel 3.4.0+)"""
         ...

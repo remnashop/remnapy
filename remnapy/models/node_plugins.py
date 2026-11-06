@@ -115,6 +115,7 @@ class NodePluginDto(BaseModel):
 
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
+    tags: list[str] = Field(default_factory=list, description="Panel 3.4.0+.")
     name: str
     plugin_config: Any | None = Field(alias="pluginConfig")
 
@@ -228,3 +229,65 @@ class PluginExecutorRequestDto(BaseModel):
 
     command: PluginCommandDto
     target_nodes: PluginTargetNodesDto = Field(alias="targetNodes")
+
+
+SharedListName = Annotated[
+    str,
+    StringConstraints(
+        min_length=2, max_length=255, pattern=r"^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*$"
+    ),
+]
+
+
+class SyncNodePluginRequestDto(BaseModel):
+    """Pushes a node plugin to its nodes (panel 3.3.0+)."""
+
+    uuid: UUID
+
+
+class SharedListDto(BaseModel):
+    """A list node plugins share, e.g. of IPs or domains (panel 3.3.0+)."""
+
+    name: str
+    config: dict[str, Any]
+
+
+class SharedListPreviewDto(BaseModel):
+    name: str
+    type: str
+    items_count: float = Field(alias="itemsCount")
+
+
+class GetSharedListsResponseDto(BaseModel):
+    total: float
+    shared_lists: list[SharedListPreviewDto] = Field(alias="sharedLists")
+
+
+class GetSharedListResponseDto(SharedListDto):
+    pass
+
+
+class CreateSharedListRequestDto(BaseModel):
+    name: SharedListName
+    config: dict[str, Any]
+
+
+class CreateSharedListResponseDto(SharedListDto):
+    pass
+
+
+class UpdateSharedListRequestDto(BaseModel):
+    name: SharedListName
+    config: dict[str, Any]
+
+
+class UpdateSharedListResponseDto(SharedListDto):
+    pass
+
+
+class DeleteSharedListRequestDto(BaseModel):
+    name: SharedListName
+
+
+class SyncSharedListRequestDto(BaseModel):
+    name: SharedListName

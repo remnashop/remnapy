@@ -278,6 +278,12 @@ class CreateHostRequestDto(BaseModel):
         super().__init__(**data)
 
 
+class CloneHostRequestDto(BaseModel):
+    """Copies a host under a new uuid (panel 3.4.4+)."""
+
+    clone_from_uuid: UUID = Field(serialization_alias="cloneFromUuid")
+
+
 class GetAllHostTagsResponseDto(BaseModel):
     tags: list[str]
 
@@ -311,6 +317,12 @@ class GetAllHostsResponseDto(RootModel[list[HostResponseDto]]):
     def __len__(self):
         """Return length of list"""
         return len(self.root)
+
+
+class CloneHostResponseDto(HostResponseDto):
+    """Clone host response"""
+
+    pass
 
 
 class GetOneHostResponseDto(HostResponseDto):

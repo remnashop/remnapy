@@ -10,6 +10,7 @@ class TemplateResponseDto(BaseModel):
     uuid: UUID
     name: str
     view_position: int = Field(alias="viewPosition")
+    tags: list[str] = Field(default_factory=list, description="Panel 3.4.0+.")
     template_type: TemplateType = Field(alias="templateType")
     template_json: Any | None = Field(alias="templateJson")
     encoded_template_yaml: str | None = Field(alias="encodedTemplateYaml")
@@ -21,6 +22,7 @@ class TemplateInfoDto(BaseModel):
     uuid: UUID
     name: str
     view_position: int = Field(alias="viewPosition")
+    tags: list[str] = Field(default_factory=list, description="Panel 3.4.0+.")
     template_type: TemplateType = Field(alias="templateType")
     template_json: Optional[Any] = Field(None, alias="templateJson")
     encoded_template_yaml: Optional[str] = Field(None, alias="encodedTemplateYaml")

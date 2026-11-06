@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 SPEC_DIR = Path(__file__).parent / "spec"
 # The version the SDK mirrors: checked field for field (test_spec_conformance).
-SPEC_PATH = SPEC_DIR / "remnawave-3.2.1.json"
+SPEC_PATH = SPEC_DIR / "remnawave-3.4.8.json"
 CONTROLLERS_DIR = Path(__file__).parent.parent / "remnapy" / "controllers"
 
 HTTP_METHODS = ("get", "post", "put", "patch", "delete")
