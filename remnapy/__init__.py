@@ -18,6 +18,7 @@ from remnapy.controllers import (
     InternalSquadsController,
     KeygenController,
     MetadataController,
+    NodeIntegrationsController,
     NodePluginsController,
     NodesController,
     PasskeysController,
@@ -101,6 +102,7 @@ class RemnawaveSDK:
         self.remnawave_settings = RemnawaveSettingsController(self._client)
         self.subscription_page_config = SubscriptionPageConfigController(self._client)
         self.connections = ConnectionsController(self._client)
+        self.node_integrations = NodeIntegrationsController(self._client)
         self.node_plugins = NodePluginsController(self._client)
         self.metadata = MetadataController(self._client)
 

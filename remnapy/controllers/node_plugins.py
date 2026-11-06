@@ -7,17 +7,29 @@ from remnapy.models import (
     CloneNodePluginResponseDto,
     CreateNodePluginRequestDto,
     CreateNodePluginResponseDto,
+    CreateSharedListRequestDto,
+    CreateSharedListResponseDto,
+    DeleteSharedListRequestDto,
     GetNodePluginResponseDto,
     GetNodePluginsResponseDto,
+    GetSharedListResponseDto,
+    GetSharedListsResponseDto,
+    GetTagsResponseDto,
     GetTorrentBlockerReportsResponseDto,
     GetTorrentBlockerReportsStatsResponseDto,
     PluginExecutorRequestDto,
     ReorderNodePluginsRequestDto,
     ReorderNodePluginsResponseDto,
+    SetTagsRequestDto,
+    SetTagsResponseDto,
+    SyncNodePluginRequestDto,
+    SyncSharedListRequestDto,
     TableFilter,
     TableSort,
     UpdateNodePluginRequestDto,
     UpdateNodePluginResponseDto,
+    UpdateSharedListRequestDto,
+    UpdateSharedListResponseDto,
 )
 from remnapy.rapid import BaseController, delete, get, patch, post
 
@@ -138,4 +150,70 @@ class NodePluginsController(BaseController):
         body: Annotated[PluginExecutorRequestDto, PydanticBody()],
     ) -> None:
         """Execute command on node plugins"""
+        ...
+
+    @get("/node-plugins/tags", response_class=GetTagsResponseDto)
+    async def get_tags(self) -> GetTagsResponseDto:
+        """Get tags of Node Plugins (panel 3.4.0+)"""
+        ...
+
+    @patch("/node-plugins/tags", response_class=SetTagsResponseDto)
+    async def set_tags(
+        self,
+        body: Annotated[SetTagsRequestDto, PydanticBody()],
+    ) -> SetTagsResponseDto:
+        """Set tags of a Node Plugin (panel 3.4.0+)"""
+        ...
+
+    @post("/node-plugins/actions/sync", response_class=None)
+    async def sync_node_plugin(
+        self,
+        body: Annotated[SyncNodePluginRequestDto, PydanticBody()],
+    ) -> None:
+        """Sync Node Plugin to nodes (panel 3.3.0+)"""
+        ...
+
+    @get("/node-plugins/shared-lists", response_class=GetSharedListsResponseDto)
+    async def get_shared_lists(self) -> GetSharedListsResponseDto:
+        """Get Shared Lists, without their contents (panel 3.3.0+)"""
+        ...
+
+    @get("/node-plugins/shared-lists/by-name", response_class=GetSharedListResponseDto)
+    async def get_shared_list_by_name(
+        self,
+        name: Annotated[str, Query(description="Shared list name")],
+    ) -> GetSharedListResponseDto:
+        """Get Shared List by name (panel 3.4.0+)"""
+        ...
+
+    @post("/node-plugins/shared-lists", response_class=CreateSharedListResponseDto)
+    async def create_shared_list(
+        self,
+        body: Annotated[CreateSharedListRequestDto, PydanticBody()],
+    ) -> CreateSharedListResponseDto:
+        """Create Shared List (panel 3.3.0+)"""
+        ...
+
+    @patch("/node-plugins/shared-lists", response_class=UpdateSharedListResponseDto)
+    async def update_shared_list(
+        self,
+        body: Annotated[UpdateSharedListRequestDto, PydanticBody()],
+    ) -> UpdateSharedListResponseDto:
+        """Update Shared List (panel 3.3.0+)"""
+        ...
+
+    @delete("/node-plugins/shared-lists", response_class=None)
+    async def delete_shared_list(
+        self,
+        body: Annotated[DeleteSharedListRequestDto, PydanticBody()],
+    ) -> None:
+        """Delete Shared List by name (panel 3.4.0+)"""
+        ...
+
+    @post("/node-plugins/shared-lists/actions/sync", response_class=None)
+    async def sync_shared_list(
+        self,
+        body: Annotated[SyncSharedListRequestDto, PydanticBody()],
+    ) -> None:
+        """Sync Shared List to nodes (panel 3.3.0+)"""
         ...

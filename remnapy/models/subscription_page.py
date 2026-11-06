@@ -11,6 +11,7 @@ class SubscriptionPageConfigDto(BaseModel):
 
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
+    tags: list[str] = Field(default_factory=list, description="Panel 3.4.0+.")
     name: str
     config: Any | None
 
@@ -35,6 +36,7 @@ class GetSubscriptionPageConfigResponseDto(BaseModel):
 
     uuid: UUID
     view_position: int = Field(alias="viewPosition")
+    tags: list[str] = Field(default_factory=list, description="Panel 3.4.0+.")
     name: str
     config: Any
 

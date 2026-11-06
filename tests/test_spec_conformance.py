@@ -1,4 +1,4 @@
-"""Check the SDK against the Remnawave 3.2.1 OpenAPI spec.
+"""Check the SDK against the OpenAPI spec of the panel it covers in full (3.4.8).
 
 These tests are offline: no live panel is needed, only shape is compared.
 """
@@ -34,18 +34,16 @@ HOST_MODELS: tuple[str, ...] = (
     "UpdateHostResponseDto",
     "GetAllHostsResponseDto",
     "GetOneHostResponseDto",
+    "CloneHostResponseDto",
 )
 
-# Top-level fields the SDK models for panels newer than the target version,
-# keyed by (model, field): (version that added it, reason). Not in the target
-# spec, so not "extra"; test_spec_compat checks them against the specs that
-# have them.
-NEWER_PANEL_FIELDS: dict[tuple[str, str], tuple[tuple[int, ...], str]] = {
-    **{
-        (model, "internalSquads"): ((3, 4, 0), "host squad mode, replaces excludedInternalSquads")
-        for model in HOST_MODELS
-    },
-    **{(model, "mapper"): ((3, 3, 0), "host config rewrites per client") for model in HOST_MODELS},
+# Top-level fields the SDK keeps for panels older than the target version,
+# keyed by (model, field): (version that removed it, reason). Not in the
+# target spec, so not "extra"; test_spec_compat checks them against the
+# specs that still have them.
+OLDER_PANEL_FIELDS: dict[tuple[str, str], tuple[tuple[int, ...], str]] = {
+    (model, "excludedInternalSquads"): ((3, 4, 0), "replaced by internalSquads in 3.4.0")
+    for model in HOST_MODELS
 }
 
 # Known query-parameter divergences left unresolved. Keyed by (METHOD,
@@ -163,7 +161,7 @@ def test_models_match_spec(kind):
             continue
 
         missing, extra = _field_diff(model_name, schema, spec, strip_response=(kind == "response"))
-        extra = {field for field in extra if (model_name, _top_level(field)) not in NEWER_PANEL_FIELDS}
+        extra = {field for field in extra if (model_name, _top_level(field)) not in OLDER_PANEL_FIELDS}
         if missing or extra:
             lines = [f"  {shape[0]} {shape[1]} — {model_name} ({endpoint.file}::{endpoint.func})"]
             lines += [f"    + missing from the SDK: {field}" for field in sorted(missing)]

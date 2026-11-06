@@ -31,11 +31,49 @@ from tests.spec_utils import (
     spec_endpoints,
     spec_version,
 )
-from tests.test_spec_conformance import NEWER_PANEL_FIELDS, WEBHOOK_SCHEMAS, _top_level
+from tests.test_spec_conformance import OLDER_PANEL_FIELDS, WEBHOOK_SCHEMAS, _top_level
 
 # SDK endpoints a panel gained after 3.0.0, by the version that added them.
 ENDPOINT_SINCE: dict[tuple[str, str], tuple[int, ...]] = {
     ("GET", "/system/configuration"): (3, 2, 0),
+    ("POST", "/snippets/actions/sync"): (3, 2, 3),
+    **{
+        endpoint: (3, 3, 0)
+        for endpoint in (
+            ("GET", "/node-integrations"),
+            ("POST", "/node-integrations"),
+            ("PATCH", "/node-integrations"),
+            ("GET", "/node-integrations/{uuid}"),
+            ("DELETE", "/node-integrations/{uuid}"),
+            ("GET", "/node-plugins/shared-lists"),
+            ("POST", "/node-plugins/shared-lists"),
+            ("PATCH", "/node-plugins/shared-lists"),
+            ("POST", "/node-plugins/shared-lists/actions/sync"),
+            ("POST", "/node-plugins/actions/sync"),
+            ("POST", "/connections/geocheck/{nodeUuid}"),
+            ("GET", "/connections/geocheck/{jobId}"),
+        )
+    },
+    **{
+        endpoint: (3, 4, 0)
+        for endpoint in (
+            ("GET", "/node-plugins/shared-lists/by-name"),
+            ("DELETE", "/node-plugins/shared-lists"),
+            *(
+                (method, f"/{prefix}/tags")
+                for prefix in (
+                    "config-profiles",
+                    "external-squads",
+                    "internal-squads",
+                    "node-plugins",
+                    "subscription-page-configs",
+                    "subscription-templates",
+                )
+                for method in ("GET", "PATCH")
+            ),
+        )
+    },
+    ("POST", "/hosts/actions/clone"): (3, 4, 4),
 }
 
 # Fields the spec types looser than the panel fills them, so a sample built from
@@ -97,6 +135,10 @@ def test_spec_versions_present():
     versions = [spec_version(path) for path in SPECS]
     assert spec_version(spec_utils.SPEC_PATH) in versions
     assert versions[0] == (3, 0, 0)
+    # a version an endpoint arrived in, and the one before it, must both be checked
+    for since in set(ENDPOINT_SINCE.values()):
+        assert since in versions, since
+        assert any(v < since for v in versions), since
 
 
 def test_sdk_endpoints_exist(spec_path):
@@ -193,8 +235,8 @@ def test_webhooks_parse(spec_path, mode):
     )
 
 
-def test_newer_panel_fields_match(spec_path):
-    """Fields modeled ahead of the target version match the panels that have them."""
+def test_older_panel_fields_match(spec_path):
+    """Fields kept for older panels match the panels that still have them."""
     version = spec_version(spec_path)
     spec = load_spec(spec_path)
     problems = []
@@ -206,16 +248,14 @@ def test_newer_panel_fields_match(spec_path):
             model = getattr(models, name or "", None)
             if model is None or schema is None:
                 continue
-            for (model_name, top), (since, _) in NEWER_PANEL_FIELDS.items():
-                if model_name != model.__name__ or version < since:
+            for (model_name, top), (removed, _) in OLDER_PANEL_FIELDS.items():
+                if model_name != model.__name__ or version >= removed:
                     continue
                 ours = {
                     f
                     for f in model_fields(model, strip_response=strip)
                     if _top_level(f) == top
                 }
-                if not ours:
-                    continue
                 theirs = {
                     f
                     for f in schema_fields(schema, spec, strip_response=strip)

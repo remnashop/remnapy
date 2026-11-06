@@ -12,6 +12,7 @@ from .infra_billing import InfraBillingController
 from .internal_squads import InternalSquadsController
 from .keygen import KeygenController
 from .metadata import MetadataController
+from .node_integrations import NodeIntegrationsController
 from .node_plugins import NodePluginsController
 from .nodes import NodesController
 from .passkeys import PasskeysController
@@ -43,6 +44,7 @@ __all__ = [
     "InternalSquadsController",
     "KeygenController",
     "MetadataController",
+    "NodeIntegrationsController",
     "NodePluginsController",
     "NodesController",
     "PasskeysController",

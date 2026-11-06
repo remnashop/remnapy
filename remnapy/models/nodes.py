@@ -5,7 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field, RootModel, StringConstraints
 
 from remnapy.models.internal_squads import InboundsDto
-from remnapy.models.webhook import NodeSystemDto, NodeVersionsDto
+from remnapy.models.webhook import NodeIpDto, NodeSystemDto, NodeVersionsDto
 
 
 class ExcludedInbounds(BaseModel):
@@ -90,6 +90,10 @@ class CreateNodeRequestDto(BaseModel):
     active_plugin_uuid: Optional[UUID] = Field(
         None, serialization_alias="activePluginUuid"
     )
+    integration_uuids: Optional[list[UUID]] = Field(
+        None, serialization_alias="integrationUuids", max_length=20, description="Panel 3.3.0+."
+    )
+    ips: Optional[list[NodeIpDto]] = Field(None, max_length=64, description="Panel 3.2.2+.")
 
 
 class UpdateNodeRequestDto(BaseModel):
@@ -132,6 +136,10 @@ class UpdateNodeRequestDto(BaseModel):
     active_plugin_uuid: Optional[UUID] = Field(
         None, serialization_alias="activePluginUuid"
     )
+    integration_uuids: Optional[list[UUID]] = Field(
+        None, serialization_alias="integrationUuids", max_length=20, description="Panel 3.3.0+."
+    )
+    ips: Optional[list[NodeIpDto]] = Field(None, max_length=64, description="Panel 3.2.2+.")
 
 
 class ReorderNodeRequestDto(BaseModel):
@@ -173,6 +181,10 @@ class NodeResponseDto(BaseModel):
     provider: Optional[NodeProviderDto] = None
     tags: list[str] = Field(default_factory=list, alias="tags")
     active_plugin_uuid: Optional[UUID] = Field(None, alias="activePluginUuid")
+    integration_uuids: list[UUID] = Field(
+        default_factory=list, alias="integrationUuids", description="Panel 3.3.0+."
+    )
+    ips: list[NodeIpDto] = Field(default_factory=list, description="Panel 3.2.2+.")
 
 
 class CreateNodeResponseDto(NodeResponseDto):
@@ -296,6 +308,9 @@ class NodesUpdateFieldsDto(BaseModel):
     ] = Field(None, serialization_alias="tags", max_length=10)
     active_plugin_uuid: Optional[UUID] = Field(
         None, serialization_alias="activePluginUuid"
+    )
+    integration_uuids: Optional[list[UUID]] = Field(
+        None, serialization_alias="integrationUuids", max_length=20, description="Panel 3.3.0+."
     )
     note: Annotated[Optional[str], StringConstraints(max_length=255)] = None
 

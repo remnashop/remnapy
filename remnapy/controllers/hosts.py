@@ -5,6 +5,8 @@ from rapid_api_client import Path
 from rapid_api_client.annotations import PydanticBody
 
 from remnapy.models import (
+    CloneHostRequestDto,
+    CloneHostResponseDto,
     CreateHostRequestDto,
     CreateHostResponseDto,
     GetAllHostsResponseDto,
@@ -71,4 +73,12 @@ class HostsController(BaseController):
         body: Annotated[ReorderHostRequestDto, PydanticBody()],
     ) -> ReorderHostResponseDto:
         """Reorder Hosts"""
+        ...
+
+    @post("/hosts/actions/clone", response_class=CloneHostResponseDto)
+    async def clone_host(
+        self,
+        body: Annotated[CloneHostRequestDto, PydanticBody()],
+    ) -> CloneHostResponseDto:
+        """Clone host (panel 3.4.4+)"""
         ...

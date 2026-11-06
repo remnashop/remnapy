@@ -5,6 +5,7 @@ from .error_code import ErrorCode
 from .fingerprint import Fingerprint
 from .hosts import InternalSquadsMode
 from .mihomo import MihomoIpVersion
+from .nodes import NodeIpStatus
 from .security_layer import SecurityLayer
 from .subscriptions_settings import (
     ResponseModificationEncryptionMethod,
@@ -40,6 +41,7 @@ __all__ = [
     "MihomoIpVersion",
     "SecurityLayer",
     "InternalSquadsMode",
+    "NodeIpStatus",
     "TemplateType",
     "ResponseRuleConditionOperator",
     "ResponseRuleOperator",

@@ -13,8 +13,11 @@ from remnapy.models import (
     GetInternalSquadAccessibleNodesResponseDto,
     GetInternalSquadByUuidResponseDto,
     GetInternalSquadUsageResponseDto,
+    GetTagsResponseDto,
     ReorderInternalSquadsRequestDto,
     ReorderInternalSquadsResponseDto,
+    SetTagsRequestDto,
+    SetTagsResponseDto,
     UpdateInternalSquadRequestDto,
     UpdateInternalSquadResponseDto,
 )
@@ -176,4 +179,17 @@ class InternalSquadsController(BaseController):
         body: Annotated[DeleteManyUsersFromInternalSquadRequestDto, PydanticBody()],
     ) -> None:
         """Remove many users from internal squad"""
+        ...
+
+    @get("/internal-squads/tags", response_class=GetTagsResponseDto)
+    async def get_tags(self) -> GetTagsResponseDto:
+        """Get tags of Internal Squads (panel 3.4.0+)"""
+        ...
+
+    @patch("/internal-squads/tags", response_class=SetTagsResponseDto)
+    async def set_tags(
+        self,
+        body: Annotated[SetTagsRequestDto, PydanticBody()],
+    ) -> SetTagsResponseDto:
+        """Set tags of a Internal Squad (panel 3.4.0+)"""
         ...

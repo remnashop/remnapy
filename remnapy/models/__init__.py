@@ -84,6 +84,11 @@ from .connections import (
     DropByUserIds,
     # Request DTOs
     DropConnectionsRequestDto,
+    GeocheckByNodeRequestDto,
+    GeocheckByNodeResponseDto,
+    GeocheckByNodeResultResponseDto,
+    GeocheckImageDto,
+    GeocheckResultDto,
     TargetAllNodes,
     TargetSpecificNodes,
 )
@@ -104,6 +109,8 @@ from .external_squads import (
     UpdateExternalSquadResponseDto,
 )
 from .hosts import (
+    CloneHostRequestDto,
+    CloneHostResponseDto,
     CreateHostInboundData,
     CreateHostRequestDto,
     CreateHostResponseDto,
@@ -210,6 +217,15 @@ from .metadata import (
     UpsertUserMetadataRequestBodyDto,
     UpsertUserMetadataResponseDto,
 )
+from .node_integrations import (
+    CreateNodeIntegrationRequestDto,
+    CreateNodeIntegrationResponseDto,
+    GetNodeIntegrationResponseDto,
+    GetNodeIntegrationsResponseDto,
+    NodeIntegrationDto,
+    UpdateNodeIntegrationRequestDto,
+    UpdateNodeIntegrationResponseDto,
+)
 from .node_plugins import (
     BlockIpItemDto,
     BlockIpsCommandDto,
@@ -217,8 +233,13 @@ from .node_plugins import (
     CloneNodePluginResponseDto,
     CreateNodePluginRequestDto,
     CreateNodePluginResponseDto,
+    CreateSharedListRequestDto,
+    CreateSharedListResponseDto,
+    DeleteSharedListRequestDto,
     GetNodePluginResponseDto,
     GetNodePluginsResponseDto,
+    GetSharedListResponseDto,
+    GetSharedListsResponseDto,
     GetTorrentBlockerReportsResponseDto,
     GetTorrentBlockerReportsStatsResponseDto,
     NodePluginDto,
@@ -227,12 +248,18 @@ from .node_plugins import (
     ReorderNodePluginItem,
     ReorderNodePluginsRequestDto,
     ReorderNodePluginsResponseDto,
+    SharedListDto,
+    SharedListPreviewDto,
+    SyncNodePluginRequestDto,
+    SyncSharedListRequestDto,
     TargetAllNodesDto,
     TargetSpecificNodesDto,
     TorrentBlockerReportRecordDto,
     UnblockIpsCommandDto,
     UpdateNodePluginRequestDto,
     UpdateNodePluginResponseDto,
+    UpdateSharedListRequestDto,
+    UpdateSharedListResponseDto,
 )
 from .nodes import (
     BulkNodesUpdateRequestDto,
@@ -301,6 +328,7 @@ from .snippets import (
     GetSnippetsResponseDto,
     SnippetItem,
     SnippetsData,
+    SyncSnippetRequestDto,
     UpdateSnippetRequestDto,
     UpdateSnippetResponseDto,
 )
@@ -422,6 +450,11 @@ from .system import (
     X25519KeyPair,
 )
 from .table_query import TableFilter, TableSort
+from .tags import (
+    GetTagsResponseDto,
+    SetTagsRequestDto,
+    SetTagsResponseDto,
+)
 from .users import (
     ActivateAllInboundsResponseDto,
     ActiveInternalSquadDto,
@@ -486,6 +519,7 @@ from .webhook import (
     HwidUserDeviceDto,
     LoginAttemptDto,
     NodeEventDto,
+    NodeIpDto,
     NodeSystemDto,
     NodeSystemInfoDto,
     NodeSystemInterfaceDto,
@@ -506,6 +540,36 @@ from .webhook import (
 )
 
 __all__ = [
+    "GeocheckByNodeRequestDto",
+    "GeocheckByNodeResponseDto",
+    "GeocheckByNodeResultResponseDto",
+    "GeocheckImageDto",
+    "GeocheckResultDto",
+    "CloneHostRequestDto",
+    "CloneHostResponseDto",
+    "CreateSharedListRequestDto",
+    "CreateSharedListResponseDto",
+    "DeleteSharedListRequestDto",
+    "GetSharedListResponseDto",
+    "GetSharedListsResponseDto",
+    "SharedListDto",
+    "SharedListPreviewDto",
+    "SyncNodePluginRequestDto",
+    "SyncSharedListRequestDto",
+    "UpdateSharedListRequestDto",
+    "UpdateSharedListResponseDto",
+    "SyncSnippetRequestDto",
+    "NodeIpDto",
+    "CreateNodeIntegrationRequestDto",
+    "CreateNodeIntegrationResponseDto",
+    "GetNodeIntegrationResponseDto",
+    "GetNodeIntegrationsResponseDto",
+    "NodeIntegrationDto",
+    "UpdateNodeIntegrationRequestDto",
+    "UpdateNodeIntegrationResponseDto",
+    "GetTagsResponseDto",
+    "SetTagsRequestDto",
+    "SetTagsResponseDto",
     # Auth models
     "GetStatusResponseDto",
     "LoginRequestDto",

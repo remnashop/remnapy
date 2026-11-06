@@ -6,9 +6,7 @@
 [![Stars](https://img.shields.io/github/stars/remnashop/remnapy.svg?style=social)](https://github.com/remnashop/remnapy/stargazers)
 [![Forks](https://img.shields.io/github/forks/remnashop/remnapy.svg?style=social)](https://github.com/remnashop/remnapy/network/members)
 [![Issues](https://img.shields.io/github/issues/remnashop/remnapy.svg)](https://github.com/remnashop/remnapy/issues)
-[![Supported python versions](https://img.shields.io/pypi/pyversions/remnapy.svg)](https://pypi.python.org/pypi/remnapy)
-[![Downloads](https://img.shields.io/pypi/dm/remnapy.svg)](https://pypi.python.org/pypi/remnapy)
-[![PyPi Package Version](https://img.shields.io/pypi/v/remnapy)](https://pypi.python.org/pypi/remnapy)
+[![Release](https://img.shields.io/github/v/release/remnashop/remnapy)](https://github.com/remnashop/remnapy/releases)
 
 A Python SDK client for interacting with the **[Remnawave API](https://docs.rw/)**.
 This library simplifies working with the API by providing convenient controllers, Pydantic models for requests and responses, and fast serialization with `orjson`. 
@@ -16,18 +14,24 @@ This library simplifies working with the API by providing convenient controllers
 ## 📦 Installation
 
 ### Release
-Install the latest release from PyPI:
+A release is a git tag; install it straight from GitHub:
 
 ```bash
-pip install remnapy
+pip install "remnapy @ git+https://github.com/remnashop/remnapy.git@v3.4.8"
 ```
 
-Pin the SDK line you build against:
+With uv:
 
 ```toml
 # pyproject.toml
-dependencies = ["remnapy (>=3.4.8, <3.5.0)"]
+[project]
+dependencies = ["remnapy"]
+
+[tool.uv.sources]
+remnapy = { git = "https://github.com/remnashop/remnapy", tag = "v3.4.8" }
 ```
+
+Releases up to 3.2.1 are also on PyPI; later ones are published only as tags.
 
 ### Unreleased
 Code merged since the last release lives in the `production` branch:
@@ -40,23 +44,30 @@ pip install git+https://github.com/remnashop/remnapy.git@production
 
 ## 🫥 Compatible versions
 
-The package version is the newest panel it is checked against: `remnapy` **3.4.8** works with Remnawave **3.0.0** through **3.4.8**. Every call the SDK has is checked offline against each panel's OpenAPI spec (`tests/spec/`, see [Tests](#-tests)).
+The package version is the panel it covers in full: `remnapy` **3.4.8** has every endpoint and field of Remnawave **3.4.8**. It also works with every older 3.x panel, down to **3.0.0**. Both are checked offline against the panels' OpenAPI specs (`tests/spec/`, see [Tests](#-tests)).
 
-Endpoints and fields are covered in full up to panel **3.2.1**; what later panels added is listed below.
-
-| Package Version | Works with panels | Covered in full |
-| --------------- | ----------------- | --------------- |
-| 3.4.8           | 3.0.0 – 3.4.8     | 3.2.1           |
-| 3.2.1           | 3.1.0 – 3.4.8 ¹   | 3.2.1           |
+| Package Version | Covered in full | Works with panels |
+| --------------- | --------------- | ----------------- |
+| 3.4.8           | 3.4.8           | 3.0.0 – 3.4.8     |
+| 3.2.1           | 3.2.1           | 3.1.0 – 3.4.8 ¹   |
 
 ¹ Panel 3.4 ignores host squad exclusions sent by this release.
 
 ### Differences between panel versions
 
-- **3.0.0** — nodes have no numeric `id` and subscription requests no `srr_response_type`: those fields are `None`. `system.get_configuration()` arrived in 3.2.0.
-- **3.3.0+** — hosts gained `mapper`, per-client rewrites of the generated config.
-- **3.4.0+** — hosts pick visible internal squads through `internal_squads` (`EXCLUDE` or `ALLOW_ONLY` mode). `excluded_internal_squads` is ignored by these panels and always empty in their responses; on older panels it is the only option.
-- Endpoints added after 3.2.1 (tags of profiles, squads, plugins and templates; node integrations; shared lists; host cloning; geocheck; sync actions) are not in the SDK yet.
+An endpoint a panel does not have answers with an API error (usually 404). A field it does not send is `None` or empty.
+
+| Panel  | Added                                                                                                                                                                             |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.1.0  | node `id`, subscription request `srr_response_type`                                                                                                                               |
+| 3.2.0  | `system.get_configuration()`                                                                                                                                                      |
+| 3.2.2  | node `ips`                                                                                                                                                                        |
+| 3.2.3  | `snippets.sync_snippet()`, `cipher_suites` in resolved proxy configs                                                                                                              |
+| 3.3.0  | `node_integrations`; shared lists and `sync_node_plugin()` in `node_plugins`; geocheck in `connections`; node `integration_uuids`; host `mapper`; SRR `respond_with_remarks` |
+| 3.4.0  | `get_tags()` / `set_tags()` on config profiles, internal and external squads, node plugins, subpage configs and subscription templates; `get_shared_list_by_name()`, `delete_shared_list()`; host `internal_squads`; slashes in snippet names |
+| 3.4.4  | `hosts.clone_host()`                                                                                                                                                              |
+
+Host squads changed in 3.4.0: older panels take `excluded_internal_squads`, newer ones `internal_squads` (`EXCLUDE` or `ALLOW_ONLY` mode) and ignore the old field, which is always empty in their responses.
 
 ### Dependencies
 - `rapid-api-client` (==0.6.0)
@@ -112,8 +123,10 @@ uv run pytest tests/test_spec_conformance.py tests/test_spec_compat.py
 
 These run offline against the bundled OpenAPI specs:
 
-- `test_spec_conformance.py` — the SDK matches panel 3.2.1, the version it covers in full (`tests/spec/remnawave-3.2.1.json`), field for field.
-- `test_spec_compat.py` — the SDK keeps working with every panel in `tests/spec/`: each endpoint it calls exists, every field the panel requires is sent, every response and webhook parses.
+- `test_spec_conformance.py` — the SDK matches panel 3.4.8, the version it covers in full (`tests/spec/remnawave-3.4.8.json`), endpoint for endpoint and field for field.
+- `test_spec_compat.py` — the SDK keeps working with every panel in `tests/spec/`: each endpoint exists from the version listed in `ENDPOINT_SINCE`, every field the panel requires is sent, every response and webhook parses.
+
+`tests/spec/` keeps the panels where something the SDK uses changed: 3.0.0, 3.1.0, 3.2.0, 3.2.2, 3.2.3, 3.3.0, 3.4.0, 3.4.4 and 3.4.8.
 
 To check another panel version, add its spec (needs Docker; the panel runs on a throwaway database and is removed afterwards):
 

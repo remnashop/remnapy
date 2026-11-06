@@ -1,7 +1,7 @@
 [project]
 name = "remnapy"
 version = "3.4.8"
-description = "A Python SDK for the Remnawave panel API (panels 3.0.0–3.4.8)."
+description = "A Python SDK for the Remnawave panel API 3.4.8, compatible back to 3.0.0."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11,<3.14"
