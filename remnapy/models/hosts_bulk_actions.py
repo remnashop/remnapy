@@ -4,7 +4,12 @@ from uuid import UUID
 from pydantic import BaseModel, Field, StringConstraints
 
 from remnapy.enums import ALPN, MihomoIpVersion, SecurityLayer, SubscriptionType
-from remnapy.models.hosts import CreateHostInboundData, HostTag
+from remnapy.models.hosts import (
+    CreateHostInboundData,
+    HostInternalSquadsDto,
+    HostMapperDto,
+    HostTag,
+)
 
 
 class UpdateManyHostsRequestDto(BaseModel):
@@ -58,8 +63,16 @@ class UpdateManyHostsRequestDto(BaseModel):
         None, serialization_alias="xrayJsonTemplateUuid"
     )
     excluded_internal_squads: Optional[list[UUID]] = Field(
-        None, serialization_alias="excludedInternalSquads"
+        None,
+        serialization_alias="excludedInternalSquads",
+        description="Panel before 3.4.0; ignored by 3.4.0+, use internal_squads.",
     )
+    internal_squads: Optional[HostInternalSquadsDto] = Field(
+        None,
+        serialization_alias="internalSquads",
+        description="Panel 3.4.0+. Replaces excluded_internal_squads.",
+    )
+    mapper: Optional[HostMapperDto] = Field(None, description="Panel 3.3.0+.")
     exclude_from_subscription_types: Optional[list[SubscriptionType]] = Field(
         None, serialization_alias="excludeFromSubscriptionTypes"
     )

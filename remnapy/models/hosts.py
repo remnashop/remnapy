@@ -1,11 +1,46 @@
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any, Literal, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, RootModel, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, RootModel, StringConstraints
 
-from remnapy.enums import ALPN, MihomoIpVersion, SecurityLayer, SubscriptionType
+from remnapy.enums import (
+    ALPN,
+    InternalSquadsMode,
+    MihomoIpVersion,
+    SecurityLayer,
+    SubscriptionType,
+)
 
 HostTag = Annotated[str, StringConstraints(max_length=36, pattern=r"^[A-Z0-9_:]+$")]
+
+
+class HostInternalSquadsDto(BaseModel):
+    """Which internal squads see the host (panel 3.4.0+)."""
+
+    mode: InternalSquadsMode
+    squads: list[UUID] = Field(default_factory=list)
+
+
+class HostMapperOperationDto(BaseModel):
+    """One rewrite of the config generated for the host (panel 3.3.0+)."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    op: Literal["copy", "set", "unset"]
+    to: str
+    from_: Optional[str] = Field(None, alias="from")
+    value: Optional[Any] = None
+
+
+class HostMapperDto(BaseModel):
+    """Per-client rewrites of the config generated for the host (panel 3.3.0+)."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    xray_json: Optional[list[HostMapperOperationDto]] = Field(None, alias="xrayJson")
+    mihomo: Optional[list[HostMapperOperationDto]] = None
+    singbox: Optional[list[HostMapperOperationDto]] = None
+    base64: Optional[list[HostMapperOperationDto]] = None
 
 
 class ReorderHostItem(BaseModel):
@@ -82,8 +117,16 @@ class UpdateHostRequestDto(BaseModel):
         None, serialization_alias="xrayJsonTemplateUuid"
     )
     excluded_internal_squads: Optional[list[UUID]] = Field(
-        None, serialization_alias="excludedInternalSquads"
+        None,
+        serialization_alias="excludedInternalSquads",
+        description="Panel before 3.4.0; ignored by 3.4.0+, use internal_squads.",
     )
+    internal_squads: Optional[HostInternalSquadsDto] = Field(
+        None,
+        serialization_alias="internalSquads",
+        description="Panel 3.4.0+. Replaces excluded_internal_squads.",
+    )
+    mapper: Optional[HostMapperDto] = Field(None, description="Panel 3.3.0+.")
     exclude_from_subscription_types: Optional[list[SubscriptionType]] = Field(
         None,
         serialization_alias="excludeFromSubscriptionTypes",
@@ -127,8 +170,14 @@ class HostResponseDto(BaseModel):
     keep_blank_sni: bool = Field(False, alias="keepSniBlank")
     xray_json_template_uuid: UUID | None = Field(alias="xrayJsonTemplateUuid")
     excluded_internal_squads: list[UUID] = Field(
-        default_factory=list, alias="excludedInternalSquads"
+        default_factory=list,
+        alias="excludedInternalSquads",
+        description="Panel before 3.4.0; empty on 3.4.0+, see internal_squads.",
     )
+    internal_squads: Optional[HostInternalSquadsDto] = Field(
+        None, alias="internalSquads", description="Panel 3.4.0+."
+    )
+    mapper: Optional[HostMapperDto] = Field(None, description="Panel 3.3.0+.")
     exclude_from_subscription_types: list[SubscriptionType] = Field(
         default_factory=list,
         alias="excludeFromSubscriptionTypes",
@@ -190,8 +239,16 @@ class CreateHostRequestDto(BaseModel):
         None, serialization_alias="xrayJsonTemplateUuid"
     )
     excluded_internal_squads: list[UUID] = Field(
-        default_factory=list, serialization_alias="excludedInternalSquads"
+        default_factory=list,
+        serialization_alias="excludedInternalSquads",
+        description="Panel before 3.4.0; ignored by 3.4.0+, use internal_squads.",
     )
+    internal_squads: Optional[HostInternalSquadsDto] = Field(
+        None,
+        serialization_alias="internalSquads",
+        description="Panel 3.4.0+. Replaces excluded_internal_squads.",
+    )
+    mapper: Optional[HostMapperDto] = Field(None, description="Panel 3.3.0+.")
     exclude_from_subscription_types: list[SubscriptionType] = Field(
         default_factory=list,
         serialization_alias="excludeFromSubscriptionTypes",

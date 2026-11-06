@@ -111,6 +111,9 @@ from .hosts import (
     GetAllHostTagsResponseDto,
     GetOneHostResponseDto,
     HostInboundData,
+    HostInternalSquadsDto,
+    HostMapperDto,
+    HostMapperOperationDto,
     HostResponseDto,
     HostsResponseDto,  # Legacy alias
     ReorderHostItem,
@@ -553,6 +556,9 @@ __all__ = [
     "GetAllHostsResponseDto",
     "GetOneHostResponseDto",
     "HostResponseDto",
+    "HostInternalSquadsDto",
+    "HostMapperDto",
+    "HostMapperOperationDto",
     "HostsResponseDto",  # Legacy alias
     "ReorderHostRequestDto",
     "ReorderHostResponseDto",
