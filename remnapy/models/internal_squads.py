@@ -87,9 +87,7 @@ class AccessibleNodeDto(BaseModel):
     country_code: Optional[str] = Field(default=None, alias="countryCode")
     config_profile_uuid: Optional[UUID] = Field(default=None, alias="configProfileUuid")
     config_profile_name: Optional[str] = Field(default=None, alias="configProfileName")
-    active_inbounds: list[Optional[UUID]] = Field(
-        default_factory=list, alias="activeInbounds"
-    )
+    active_inbounds: list[str] = Field(default_factory=list, alias="activeInbounds")
 
 
 class GetInternalSquadAccessibleNodesResponseDto(BaseModel):

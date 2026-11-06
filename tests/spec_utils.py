@@ -7,13 +7,15 @@ import json
 import re
 import typing
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cache, lru_cache
 from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel
 
-SPEC_PATH = Path(__file__).parent / "spec" / "remnawave-3.2.1.json"
+SPEC_DIR = Path(__file__).parent / "spec"
+# The version the SDK mirrors: checked field for field (test_spec_conformance).
+SPEC_PATH = SPEC_DIR / "remnawave-3.2.1.json"
 CONTROLLERS_DIR = Path(__file__).parent.parent / "remnapy" / "controllers"
 
 HTTP_METHODS = ("get", "post", "put", "patch", "delete")
@@ -36,11 +38,21 @@ class SdkEndpoint:
     query_params: frozenset[str] = frozenset()
 
 
-@lru_cache(maxsize=1)
-def load_spec() -> dict[str, Any]:
-    """Load the OpenAPI spec."""
-    with SPEC_PATH.open(encoding="utf-8") as fh:
+@cache
+def load_spec(path: Path = SPEC_PATH) -> dict[str, Any]:
+    """Load an OpenAPI spec, the target version's by default."""
+    with path.open(encoding="utf-8") as fh:
         return json.load(fh)
+
+
+def compat_specs() -> list[Path]:
+    """Specs of every panel version the SDK must keep working with, oldest first."""
+    return sorted(SPEC_DIR.glob("remnawave-*.json"), key=lambda path: spec_version(path))
+
+
+def spec_version(path: Path) -> tuple[int, ...]:
+    """`remnawave-3.4.8.json` -> (3, 4, 8)."""
+    return tuple(int(part) for part in path.stem.removeprefix("remnawave-").split("."))
 
 
 def normalize_path(path: str) -> str:
@@ -48,13 +60,13 @@ def normalize_path(path: str) -> str:
     return re.sub(r"\{[^}]+\}", "{}", path)
 
 
-@lru_cache(maxsize=1)
-def spec_endpoints() -> dict[tuple[str, str], dict[str, Any]]:
+@cache
+def spec_endpoints(path: Path = SPEC_PATH) -> dict[tuple[str, str], dict[str, Any]]:
     """Endpoints from the spec, keyed by (METHOD, path without the /api prefix)."""
-    spec = load_spec()
+    spec = load_spec(path)
     result: dict[tuple[str, str], dict[str, Any]] = {}
-    for path, operations in spec["paths"].items():
-        sdk_path = path.removeprefix("/api")
+    for route, operations in spec["paths"].items():
+        sdk_path = route.removeprefix("/api")
         for method, operation in operations.items():
             if method in HTTP_METHODS:
                 result[(method.upper(), sdk_path)] = operation
@@ -298,6 +310,7 @@ def sample_payload(
     spec: dict[str, Any],
     nullable_as_null: bool = False,
     depth: int = 0,
+    required_only: bool = False,
 ) -> Any:
     """Build a value that satisfies the schema.
 
@@ -307,20 +320,33 @@ def sample_payload(
 
     ``nullable_as_null`` substitutes ``None`` everywhere the spec marks a field
     ``nullable``, which checks that the model survives empty values.
+    ``required_only`` leaves out every property the spec does not require,
+    which checks that the model demands nothing the panel may omit.
     """
     if depth > 12 or schema is None:
         return None
 
     if "$ref" in schema:
         target = spec["components"]["schemas"].get(schema["$ref"].rsplit("/", 1)[-1], {})
-        return sample_payload(target, spec, nullable_as_null, depth + 1)
+        return sample_payload(target, spec, nullable_as_null, depth + 1, required_only)
 
-    for combinator in ("allOf", "oneOf", "anyOf"):
+    if "allOf" in schema:
+        # an intersection: every part contributes properties
+        merged: dict[str, Any] = {}
+        for part in schema["allOf"]:
+            value = sample_payload(part, spec, nullable_as_null, depth + 1, required_only)
+            if isinstance(value, dict):
+                merged.update(value)
+        return merged
+    for combinator in ("oneOf", "anyOf"):
         if combinator in schema:
-            return sample_payload(schema[combinator][0], spec, nullable_as_null, depth + 1)
+            return sample_payload(schema[combinator][0], spec, nullable_as_null, depth + 1, required_only)
 
     if schema.get("nullable") and nullable_as_null:
         return None
+    if not schema:
+        # `{}` is the spec's "any": the panel sends an object there (configs, WebAuthn options)
+        return {}
     if "enum" in schema:
         return schema["enum"][0]
 
@@ -328,12 +354,14 @@ def sample_payload(
     if kind == "object" and "properties" not in schema:
         return {}
     if kind == "object" or "properties" in schema:
+        required = set(schema.get("required", []))
         return {
-            name: sample_payload(sub, spec, nullable_as_null, depth + 1)
+            name: sample_payload(sub, spec, nullable_as_null, depth + 1, required_only)
             for name, sub in schema.get("properties", {}).items()
+            if not required_only or name in required
         }
     if kind == "array":
-        return [sample_payload(schema.get("items"), spec, nullable_as_null, depth + 1)]
+        return [sample_payload(schema.get("items"), spec, nullable_as_null, depth + 1, required_only)]
     if kind == "string":
         return _sample_string(schema)
     if kind in ("number", "integer"):
@@ -361,6 +389,9 @@ def _sample_string(schema: dict[str, Any]) -> str:
         return "::1"
 
     pattern = schema.get("pattern", "")
+    # zod's ISO datetime regex; some panel builds drop `format: date-time`
+    if "[2468][048]" in pattern:
+        return "2026-01-01T00:00:00.000Z"
     if pattern == "^[A-Z0-9_:]+$":
         return "TAG"
     if "0-9a-fA-F" in pattern:

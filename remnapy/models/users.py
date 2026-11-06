@@ -254,7 +254,9 @@ class SubscriptionRequestRecord(BaseModel):
     id: int
     user_id: int = Field(alias="userId")
     request_at: datetime = Field(alias="requestAt")
-    srr_response_type: str = Field(alias="srrResponseType")
+    srr_response_type: Optional[str] = Field(
+        None, alias="srrResponseType", description="Panel 3.1.0+."
+    )
     srr_rule_name: Optional[str] = Field(None, alias="srrRuleName")
     request_ip: Optional[str] = Field(None, alias="requestIp")
     user_agent: Optional[str] = Field(None, alias="userAgent")

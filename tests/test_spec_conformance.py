@@ -26,6 +26,28 @@ from tests.spec_utils import (
 # Divergences accepted as intentional. Every entry must carry a reason.
 ALLOWED_FIELD_DIFFS: dict[tuple[str, str], str] = {}
 
+HOST_MODELS: tuple[str, ...] = (
+    "CreateHostRequestDto",
+    "UpdateHostRequestDto",
+    "UpdateManyHostsRequestDto",
+    "CreateHostResponseDto",
+    "UpdateHostResponseDto",
+    "GetAllHostsResponseDto",
+    "GetOneHostResponseDto",
+)
+
+# Top-level fields the SDK models for panels newer than the target version,
+# keyed by (model, field): (version that added it, reason). Not in the target
+# spec, so not "extra"; test_spec_compat checks them against the specs that
+# have them.
+NEWER_PANEL_FIELDS: dict[tuple[str, str], tuple[tuple[int, ...], str]] = {
+    **{
+        (model, "internalSquads"): ((3, 4, 0), "host squad mode, replaces excludedInternalSquads")
+        for model in HOST_MODELS
+    },
+    **{(model, "mapper"): ((3, 3, 0), "host config rewrites per client") for model in HOST_MODELS},
+}
+
 # Known query-parameter divergences left unresolved. Keyed by (METHOD,
 # normalized path). Every entry must carry a reason.
 ALLOWED_QUERY_PARAM_DIFFS: dict[tuple[str, str], str] = {}
@@ -114,6 +136,10 @@ def _field_diff(
     return expected - actual, actual - expected
 
 
+def _top_level(field: str) -> str:
+    return re.split(r"\.|\[\]", field.removeprefix("[]"), maxsplit=1)[0]
+
+
 @pytest.mark.parametrize("kind", ["request", "response"])
 def test_models_match_spec(kind):
     """Request/response model fields match the spec schemas."""
@@ -137,6 +163,7 @@ def test_models_match_spec(kind):
             continue
 
         missing, extra = _field_diff(model_name, schema, spec, strip_response=(kind == "response"))
+        extra = {field for field in extra if (model_name, _top_level(field)) not in NEWER_PANEL_FIELDS}
         if missing or extra:
             lines = [f"  {shape[0]} {shape[1]} — {model_name} ({endpoint.file}::{endpoint.func})"]
             lines += [f"    + missing from the SDK: {field}" for field in sorted(missing)]

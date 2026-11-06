@@ -15,36 +15,48 @@ This library simplifies working with the API by providing convenient controllers
 
 ## 📦 Installation
 
-### Production Version
+### Release
 Install the latest release from PyPI:
 
 ```bash
 pip install remnapy
 ```
 
-Pin the version to the panel line you run:
+Pin the SDK line you build against:
 
 ```toml
 # pyproject.toml
-dependencies = ["remnapy (>=3.2.1, <3.3.0)"]
+dependencies = ["remnapy (>=3.4.8, <3.5.0)"]
 ```
 
-### Development Version
-If you need the unreleased code from the `development` branch:
+### Unreleased
+Code merged since the last release lives in the `production` branch:
 
 ```bash
-pip install git+https://github.com/remnashop/remnapy.git@development
+pip install git+https://github.com/remnashop/remnapy.git@production
 ```
 
 ---
 
 ## 🫥 Compatible versions
 
-The package version mirrors the Remnawave panel version exactly — `remnapy` **3.2.1** targets Remnawave **3.2.1**.
+The package version is the newest panel it is checked against: `remnapy` **3.4.8** works with Remnawave **3.0.0** through **3.4.8**. Every call the SDK has is checked offline against each panel's OpenAPI spec (`tests/spec/`, see [Tests](#-tests)).
 
-| Package Version | Remnawave Panel Version |
-| --------------- | ----------------------- |
-| 3.2.1           | >=3.2.1, <3.3.0         |
+Endpoints and fields are covered in full up to panel **3.2.1**; what later panels added is listed below.
+
+| Package Version | Works with panels | Covered in full |
+| --------------- | ----------------- | --------------- |
+| 3.4.8           | 3.0.0 – 3.4.8     | 3.2.1           |
+| 3.2.1           | 3.1.0 – 3.4.8 ¹   | 3.2.1           |
+
+¹ Panel 3.4 ignores host squad exclusions sent by this release.
+
+### Differences between panel versions
+
+- **3.0.0** — nodes have no numeric `id` and subscription requests no `srr_response_type`: those fields are `None`. `system.get_configuration()` arrived in 3.2.0.
+- **3.3.0+** — hosts gained `mapper`, per-client rewrites of the generated config.
+- **3.4.0+** — hosts pick visible internal squads through `internal_squads` (`EXCLUDE` or `ALLOW_ONLY` mode). `excluded_internal_squads` is ignored by these panels and always empty in their responses; on older panels it is the only option.
+- Endpoints added after 3.2.1 (tags of profiles, squads, plugins and templates; node integrations; shared lists; host cloning; geocheck; sync actions) are not in the SDK yet.
 
 ### Dependencies
 - `rapid-api-client` (==0.6.0)
@@ -91,6 +103,25 @@ if __name__ == "__main__":
 ```
 
 ---
+
+## 🧪 Tests
+
+```bash
+uv run pytest tests/test_spec_conformance.py tests/test_spec_compat.py
+```
+
+These run offline against the bundled OpenAPI specs:
+
+- `test_spec_conformance.py` — the SDK matches panel 3.2.1, the version it covers in full (`tests/spec/remnawave-3.2.1.json`), field for field.
+- `test_spec_compat.py` — the SDK keeps working with every panel in `tests/spec/`: each endpoint it calls exists, every field the panel requires is sent, every response and webhook parses.
+
+To check another panel version, add its spec (needs Docker; the panel runs on a throwaway database and is removed afterwards):
+
+```bash
+scripts/fetch-panel-spec.sh 3.4.8
+```
+
+The remaining tests call a live panel and read its address and fixtures from `.env` (see `tests/conftest.py`).
 
 ## ❤️ About
 

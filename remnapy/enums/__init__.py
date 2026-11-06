@@ -3,6 +3,7 @@ from .auth import OAuth2Provider
 from .client_type import ClientType
 from .error_code import ErrorCode
 from .fingerprint import Fingerprint
+from .hosts import InternalSquadsMode
 from .mihomo import MihomoIpVersion
 from .security_layer import SecurityLayer
 from .subscriptions_settings import (
@@ -38,6 +39,7 @@ __all__ = [
     "Fingerprint",
     "MihomoIpVersion",
     "SecurityLayer",
+    "InternalSquadsMode",
     "TemplateType",
     "ResponseRuleConditionOperator",
     "ResponseRuleOperator",

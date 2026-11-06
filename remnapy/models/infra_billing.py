@@ -70,11 +70,11 @@ class InfraBillingHistoryDto(BaseModel):
 
 class InfraBillingNodeDto(BaseModel):
     uuid: UUID
-    node_uuid: UUID = Field(alias="nodeUuid")
+    node_uuid: Optional[UUID] = Field(alias="nodeUuid")
     name: Optional[str] = None
     provider_uuid: UUID = Field(alias="providerUuid")
     provider: InfraProviderSimpleDto
-    node: NodeDto
+    node: Optional[NodeDto]
     next_billing_at: datetime = Field(alias="nextBillingAt")
     created_at: datetime = Field(alias="createdAt")
     updated_at: datetime = Field(alias="updatedAt")
