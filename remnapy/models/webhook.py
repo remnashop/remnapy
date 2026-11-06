@@ -365,7 +365,7 @@ class WebhookNodeDto(BaseModel):
     """Node entity as sent in node.* and torrent_blocker.report webhook events"""
 
     uuid: UUID
-    id: int
+    id: Optional[int] = None  # panel 3.1.0+
     name: str
     address: str
     port: Optional[int]

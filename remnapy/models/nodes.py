@@ -140,7 +140,7 @@ class ReorderNodeRequestDto(BaseModel):
 
 class NodeResponseDto(BaseModel):
     uuid: UUID
-    id: int
+    id: Optional[int] = Field(None, description="Panel 3.1.0+.")
     name: str
     address: str
     port: Optional[int] = None
