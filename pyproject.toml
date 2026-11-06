@@ -1,7 +1,7 @@
 [project]
 name = "remnapy"
-dynamic = ["version"]
-description = "A Python SDK for the Remnawave panel API (targets 3.2.1, works with 3.0.0–3.4.8)."
+version = "3.4.8"
+description = "A Python SDK for the Remnawave panel API (panels 3.0.0–3.4.8)."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11,<3.14"
@@ -64,9 +64,6 @@ asyncio_default_fixture_loop_scope = "function"
 [tool.ruff.lint]
 ignore = ["UP007", "UP045", "PIE790"]
 
-[tool.setuptools_scm]
-tag_regex = "^v(?P<version>.+)$"
-
 [build-system]
-requires = ["setuptools>=68", "setuptools_scm[toml]>=8"]
+requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
