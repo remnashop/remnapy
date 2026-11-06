@@ -15,7 +15,7 @@ This library simplifies working with the API by providing convenient controllers
 
 ## 📦 Installation
 
-### Production Version
+### Release
 Install the latest release from PyPI:
 
 ```bash
@@ -29,11 +29,11 @@ Pin the SDK line you build against:
 dependencies = ["remnapy (>=3.2.1, <3.3.0)"]
 ```
 
-### Development Version
-If you need the unreleased code from the `development` branch:
+### Unreleased
+Code merged since the last release lives in the `production` branch:
 
 ```bash
-pip install git+https://github.com/remnashop/remnapy.git@development
+pip install git+https://github.com/remnashop/remnapy.git@production
 ```
 
 ---
@@ -46,7 +46,7 @@ Every call the SDK has also works with the other panels of the 3.x line, from **
 
 | Package Version | Target panel | Works with panels |
 | --------------- | ------------ | ----------------- |
-| development     | 3.2.1        | 3.0.0 – 3.4.8     |
+| unreleased      | 3.2.1        | 3.0.0 – 3.4.8     |
 | 3.2.1           | 3.2.1        | 3.1.0 – 3.4.8 ¹   |
 
 ¹ Panel 3.4 ignores host squad exclusions sent by this release.
